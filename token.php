@@ -1,4 +1,5 @@
 <?php
+include_once("includes/mysql_connect.php");
 
 $api_key = '7e4980e11f58827f0ceaf0ca7e38dfa3';
 $secret_key = 'ab7b9fae77cbf98b988b18542beea0ed';
@@ -29,6 +30,13 @@ if( hash_equals($hmac, $new_hmac) ) {
     $response = json_decode($response, true);
 
     echo print_r($response);
+
+    $query = "INSERT INTO shops (shop_url, access_token, install_date) VALUES ('" . $shop_url . "','" . $response['access_token'] . "', NOW()) ON DUPLICATE KEY UPDATE access_token='" . $response['access_token'] . "'";
+    if($mysql->query($query)) {
+        echo "<script>top.window.location = 'https://" . $shop_url . "/admin/apps'</script>";
+        die;
+    }
+    
 }else {
     echo "Not OK";
 }
